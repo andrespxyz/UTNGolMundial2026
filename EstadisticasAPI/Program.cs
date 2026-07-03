@@ -35,7 +35,3 @@ app.UseAuthorization();
 app.MapControllers();
 app.Run();
 
-static void hola()
-{
-    string = "hola";
-}
