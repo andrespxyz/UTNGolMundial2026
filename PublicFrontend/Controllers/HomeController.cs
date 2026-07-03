@@ -1,32 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
-using PublicFrontend.Models;
-using System.Diagnostics;
+using PublicFrontend.Services;
 
 namespace PublicFrontend.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly EstadisticasClientService _estadisticas;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(EstadisticasClientService estadisticas)
         {
-            _logger = logger;
+            _estadisticas = estadisticas;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var selecciones = await _estadisticas.GetSeleccionesAsync();
+            var partidos = await _estadisticas.GetPartidosAsync();
+            ViewBag.TotalSelecciones = selecciones.Count;
+            ViewBag.TotalPartidos = partidos.Count;
+            ViewBag.PartidosFinalizados = partidos.Count(p => p.Estado == "finalizado");
             return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

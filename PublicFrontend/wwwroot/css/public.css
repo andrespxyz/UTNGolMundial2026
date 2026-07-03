@@ -1,0 +1,460 @@
+﻿* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+}
+
+/* NAVBAR */
+.navbar {
+    background: linear-gradient(135deg, #1a0000, #8B0000);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    border-bottom: 3px solid #CC0000;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(204,0,0,0.4);
+}
+
+.navbar-brand {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .navbar-brand span {
+        color: #CC0000;
+    }
+
+.navbar-nav {
+    display: flex;
+    gap: 4px;
+}
+
+.nav-link {
+    color: #ddd;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+
+    .nav-link:hover {
+        background: rgba(204,0,0,0.3);
+        color: #fff;
+    }
+
+    .nav-link.active {
+        background: #CC0000;
+        color: #fff;
+    }
+
+/* HERO */
+.hero {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #0a0a0a 100%);
+    padding: 80px 32px;
+    text-align: center;
+    border-bottom: 2px solid #CC0000;
+    position: relative;
+    overflow: hidden;
+}
+
+    .hero::before {
+        content: "⚽";
+        position: absolute;
+        font-size: 300px;
+        opacity: 0.03;
+        top: -50px;
+        right: -50px;
+    }
+
+    .hero h1 {
+        font-size: 52px;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 12px;
+        text-shadow: 0 0 30px rgba(204,0,0,0.5);
+    }
+
+        .hero h1 span {
+            color: #CC0000;
+        }
+
+    .hero p {
+        font-size: 18px;
+        color: #aaa;
+        margin-bottom: 32px;
+    }
+
+/* STATS BAR */
+.stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    background: rgba(204,0,0,0.1);
+    border: 1px solid rgba(204,0,0,0.3);
+    border-radius: 12px;
+    padding: 24px 48px;
+    margin: 0 auto 48px;
+    max-width: 700px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+    .stat-item .num {
+        font-size: 36px;
+        font-weight: 900;
+        color: #CC0000;
+    }
+
+    .stat-item .lbl {
+        font-size: 13px;
+        color: #aaa;
+        margin-top: 4px;
+    }
+
+/* CONTAINER */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #CC0000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* CARDS */
+.card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+}
+
+    .card:hover {
+        border-color: #CC0000;
+    }
+
+/* TABLA */
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .tabla th {
+        background: #CC0000;
+        color: #fff;
+        padding: 14px 16px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .tabla td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #1a1a1a;
+        font-size: 14px;
+        color: #ccc;
+    }
+
+    .tabla tr:hover td {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .tabla tr:last-child td {
+        border-bottom: none;
+    }
+
+/* BADGES */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-red {
+    background: rgba(204,0,0,0.2);
+    color: #ff4444;
+    border: 1px solid #CC0000;
+}
+
+.badge-green {
+    background: rgba(0,180,0,0.2);
+    color: #44ff44;
+    border: 1px solid #00b400;
+}
+
+.badge-gray {
+    background: rgba(255,255,255,0.1);
+    color: #aaa;
+    border: 1px solid #333;
+}
+
+/* PARTIDO CARD */
+.partido-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+
+    .partido-card:hover {
+        border-color: #CC0000;
+        background: #151515;
+    }
+
+.equipo {
+    text-align: center;
+    flex: 1;
+}
+
+.equipo-nombre {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.equipo-codigo {
+    font-size: 12px;
+    color: #CC0000;
+    margin-top: 4px;
+}
+
+.marcador {
+    font-size: 28px;
+    font-weight: 900;
+    color: #CC0000;
+    padding: 0 24px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.partido-info {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* GRUPO */
+.grupo-header {
+    background: linear-gradient(135deg, #CC0000, #8B0000);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.grupo-table {
+    margin-bottom: 32px;
+}
+
+/* FORM */
+.form-group {
+    margin-bottom: 16px;
+}
+
+    .form-group label {
+        display: block;
+        color: #aaa;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #CC0000;
+    }
+
+.btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-red {
+    background: #CC0000;
+    color: #fff;
+}
+
+    .btn-red:hover {
+        background: #aa0000;
+    }
+
+.btn-outline {
+    background: transparent;
+    color: #CC0000;
+    border: 2px solid #CC0000;
+}
+
+    .btn-outline:hover {
+        background: #CC0000;
+        color: #fff;
+    }
+
+/* BILLETERA */
+.billetera-card {
+    background: linear-gradient(135deg, #1a0000, #2a0000);
+    border: 2px solid #CC0000;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.billetera-saldo {
+    font-size: 48px;
+    font-weight: 900;
+    color: #CC0000;
+}
+
+.billetera-label {
+    font-size: 14px;
+    color: #aaa;
+}
+
+/* RANKING */
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+
+    .ranking-item:hover {
+        border-color: #CC0000;
+    }
+
+.ranking-pos {
+    font-size: 20px;
+    font-weight: 900;
+    color: #CC0000;
+    min-width: 40px;
+}
+
+    .ranking-pos.gold {
+        color: #FFD700;
+    }
+
+    .ranking-pos.silver {
+        color: #C0C0C0;
+    }
+
+    .ranking-pos.bronze {
+        color: #CD7F32;
+    }
+
+.ranking-nombre {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ranking-saldo {
+    font-size: 20px;
+    font-weight: 900;
+    color: #CC0000;
+}
+
+/* ALERT */
+.alert {
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.alert-success {
+    background: rgba(0,180,0,0.1);
+    border: 1px solid #00b400;
+    color: #44ff44;
+}
+
+.alert-error {
+    background: rgba(204,0,0,0.1);
+    border: 1px solid #CC0000;
+    color: #ff4444;
+}
+
+/* FOOTER */
+.footer {
+    background: #050505;
+    border-top: 2px solid #CC0000;
+    padding: 32px;
+    text-align: center;
+    color: #444;
+    font-size: 13px;
+    margin-top: 60px;
+}
+
+    .footer span {
+        color: #CC0000;
+    }

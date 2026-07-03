@@ -1,0 +1,115 @@
+﻿@model List<PublicFrontend.Models.Partido>
+@{
+    ViewData["Title"] = "Predicciones";
+    var billetera = ViewBag.Billetera as PublicFrontend.Models.Billetera;
+    var predicciones = ViewBag.Predicciones as List<PublicFrontend.Models.Prediccion>;
+}
+
+<div class="container">
+    <h2 class="section-title">🎯 Predicciones UTNGolCoin</h2>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success">✅ @TempData["Exito"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error">❌ @TempData["Error"]</div>
+    }
+
+    @if (billetera != null)
+    {
+        <div class="billetera-card">
+            <div style="font-size:48px">💰</div>
+            <div>
+                <div class="billetera-label">Tu saldo UTNGolCoin</div>
+                <div class="billetera-saldo">@billetera.Saldo</div>
+                <div class="billetera-label">@billetera.NombreUsuario</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-error">
+            ❌ No tienes billetera registrada. Primero debes registrarte en el sistema.
+        </div>
+    }
+
+    <h3 style="color:#fff; margin-bottom:16px">Partidos disponibles para predecir</h3>
+
+    @foreach (var p in Model)
+    {
+        <div class="partido-card" style="flex-direction:column; align-items:stretch;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+                <div class="equipo">
+                    <div class="equipo-nombre">@(p.SeleccionLocal?.Nombre ?? "TBD")</div>
+                </div>
+                <div class="marcador" style="font-size:18px; color:#666">VS</div>
+                <div class="equipo">
+                    <div class="equipo-nombre">@(p.SeleccionVisitante?.Nombre ?? "TBD")</div>
+                </div>
+            </div>
+            <div class="partido-info" style="margin-bottom:16px">📅 @p.FechaHora — 📍 @(p.Sede?.Ciudad ?? "")</div>
+            @if (billetera != null)
+            {
+                <form method="post" asp-action="Predecir" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+                    <input type="hidden" name="partidoId" value="@p.Id" />
+                    <div class="form-group" style="margin:0">
+                        <label>Pronóstico</label>
+                        <select name="pronostico" class="form-control" style="width:160px">
+                            <option value="LOCAL">🏠 Gana Local</option>
+                            <option value="EMPATE">🤝 Empate</option>
+                            <option value="VISITANTE">✈️ Gana Visitante</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0">
+                        <label>Monto (UTNGolCoin)</label>
+                        <input type="number" name="monto" min="1" max="@billetera.Saldo"
+                               value="1" class="form-control" style="width:120px" />
+                    </div>
+                    <button type="submit" class="btn btn-red">🎯 Predecir</button>
+                </form>
+            }
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card" style="text-align:center; color:#666; padding:60px">
+            <p style="font-size:48px">🎯</p>
+            <p>No hay partidos disponibles para predecir.</p>
+        </div>
+    }
+
+    @if (predicciones != null && predicciones.Any())
+    {
+        <h3 style="color:#fff; margin: 32px 0 16px">Mis predicciones</h3>
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Partido</th>
+                    <th>Pronóstico</th>
+                    <th>Monto</th>
+                    <th>Cuota</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pred in predicciones)
+                {
+                    <tr>
+                        <td>Partido #@pred.PartidoId</td>
+                        <td>@pred.Pronostico</td>
+                        <td>@pred.Monto UTNGolCoin</td>
+                        <td>x@pred.Cuota</td>
+                        <td>
+                            <span class="badge @(pred.Estado == "GANADA" ? "badge-green" : pred.Estado == "PERDIDA" ? "badge-red" : "badge-gray")">
+                                @pred.Estado
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

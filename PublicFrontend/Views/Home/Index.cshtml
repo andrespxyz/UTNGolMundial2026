@@ -1,8 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero">
+    <h1>UTN <span>GolMundial</span> 2026</h1>
+    <p>Sigue cada partido, predice resultados y gana UTNGolCoin</p>
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="num">@ViewBag.TotalSelecciones</div>
+            <div class="lbl">Selecciones</div>
+        </div>
+        <div class="stat-item">
+            <div class="num">@ViewBag.TotalPartidos</div>
+            <div class="lbl">Partidos</div>
+        </div>
+        <div class="stat-item">
+            <div class="num">@ViewBag.PartidosFinalizados</div>
+            <div class="lbl">Finalizados</div>
+        </div>
+        <div class="stat-item">
+            <div class="num">3</div>
+            <div class="lbl">Países Sede</div>
+        </div>
+    </div>
+    <a class="btn btn-red" asp-controller="Calendario" asp-action="Index">Ver Calendario</a>
+    &nbsp;
+    <a class="btn btn-outline" asp-controller="Posiciones" asp-action="Index">Ver Posiciones</a>
+</div>
+
+<div class="container">
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:20px;">
+        <div class="card">
+            <div style="font-size:36px; margin-bottom:12px">📅</div>
+            <h3 style="color:#CC0000; margin-bottom:8px">Calendario</h3>
+            <p style="color:#aaa; font-size:14px">Consulta todos los partidos del Mundial con fechas, horarios y sedes.</p>
+            <br />
+            <a class="btn btn-outline" asp-controller="Calendario" asp-action="Index">Ver partidos</a>
+        </div>
+        <div class="card">
+            <div style="font-size:36px; margin-bottom:12px">🏆</div>
+            <h3 style="color:#CC0000; margin-bottom:8px">Posiciones</h3>
+            <p style="color:#aaa; font-size:14px">Tablas actualizadas de todos los grupos del torneo en tiempo real.</p>
+            <br />
+            <a class="btn btn-outline" asp-controller="Posiciones" asp-action="Index">Ver grupos</a>
+        </div>
+        <div class="card">
+            <div style="font-size:36px; margin-bottom:12px">🎯</div>
+            <h3 style="color:#CC0000; margin-bottom:8px">Predicciones</h3>
+            <p style="color:#aaa; font-size:14px">Usa tus UTNGolCoin para predecir resultados y ganar premios.</p>
+            <br />
+            <a class="btn btn-outline" asp-controller="Predicciones" asp-action="Index">Predecir</a>
+        </div>
+    </div>
 </div>

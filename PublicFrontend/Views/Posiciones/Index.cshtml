@@ -1,0 +1,60 @@
+﻿@model Dictionary<string, List<PublicFrontend.Models.Seleccion>>
+@{
+    ViewData["Title"] = "Posiciones";
+}
+
+<div class="container">
+    <h2 class="section-title">🏆 Tabla de Posiciones</h2>
+
+    @foreach (var grupo in Model)
+    {
+        <div class="grupo-table">
+            <div class="grupo-header">GRUPO @grupo.Key</div>
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Selección</th>
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PE</th>
+                        <th>PP</th>
+                        <th>GF</th>
+                        <th>GC</th>
+                        <th>DIF</th>
+                        <th>PTS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int pos = 1;
+                    }
+                    @foreach (var s in grupo.Value)
+                    {
+                        <tr>
+                            <td style="font-weight:700; color:@(pos <= 2 ? "#CC0000" : "#666")">@pos</td>
+                            <td style="font-weight:700; color:#fff">@s.Nombre</td>
+                            <td>@s.PartidosJugados</td>
+                            <td>@s.PartidosGanados</td>
+                            <td>@s.PartidosEmpatados</td>
+                            <td>@s.PartidosPerdidos</td>
+                            <td>@s.GolesFavor</td>
+                            <td>@s.GolesContra</td>
+                            <td>@(s.GolesFavor - s.GolesContra)</td>
+                            <td style="font-weight:900; color:#CC0000">@s.Puntos</td>
+                        </tr>
+                        pos++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card" style="text-align:center; color:#666; padding:60px">
+            <p style="font-size:48px">🏆</p>
+            <p>No hay selecciones registradas aún.</p>
+        </div>
+    }
+</div>
