@@ -1,4 +1,5 @@
 using EstadisticasAPI.Data;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,4 +37,5 @@ app.Run();
 
 static void hola()
 {
+    string = "hola";
 }
