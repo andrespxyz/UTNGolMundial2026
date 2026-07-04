@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-
+//prueba
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -34,5 +34,3 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
-//sd
