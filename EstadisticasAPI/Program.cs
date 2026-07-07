@@ -6,7 +6,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "UTN GolMundial 2026 — Estadísticas API",
+        Version = "v1",
+        Description = "API REST para gestión de estadísticas del Mundial de Fútbol 2026. Maneja selecciones, sedes, partidos, resultados y usuarios.",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Universidad Técnica del Norte",
+            Email = "info@utn.edu.ec"
+        }
+    });
+}); 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
