@@ -64,5 +64,28 @@ namespace PublicFrontend.Services
             }
             catch { return new(); }
         }
+
+        public async Task<Billetera?> CrearBilleteraAsync(int usuarioId, string nombreUsuario)
+        {
+            try
+            {
+                var body = JsonSerializer.Serialize(new { usuarioId, nombreUsuario });
+                var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                var response = await _http.PostAsync($"{BaseUrl}/billeteras", content);
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<Billetera>(json, Opts);
+            }
+            catch { return null; }
+        }
+
+        public async Task<bool> AplicarBonoDiarioAsync(int billeteraId)
+        {
+            try
+            {
+                var response = await _http.PostAsync($"{BaseUrl}/billeteras/{billeteraId}/bono-diario", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
     }
 }

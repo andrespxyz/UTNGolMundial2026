@@ -37,5 +37,53 @@ namespace PublicFrontend.Services
             var json = await _http.GetStringAsync($"{BaseUrl}/Sedes");
             return JsonSerializer.Deserialize<List<Sede>>(json, Opts) ?? new();
         }
+
+        public async Task<(bool exito, object? datos, string mensaje)> LoginAsync(string email, string password)
+        {
+            try
+            {
+                var body = JsonSerializer.Serialize(new { email, password });
+                var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                var response = await _http.PostAsync($"{BaseUrl}/Auth/login", content);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var datos = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json, Opts);
+                    return (true, datos, "");
+                }
+                var error = JsonSerializer.Deserialize<Dictionary<string, string>>(json, Opts);
+                return (false, null, error?["mensaje"] ?? "Error al iniciar sesión.");
+            }
+            catch (Exception e)
+            {
+                return (false, null, e.Message);
+            }
+        }
+
+        public async Task<(bool exito, object? datos, string mensaje)> RegistroAsync(string nombreUsuario, string email, string password)
+        {
+            try
+            {
+                var body = JsonSerializer.Serialize(new { nombreUsuario, email, password });
+                var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                var response = await _http.PostAsync($"{BaseUrl}/Auth/registro", content);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var datos = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json, Opts);
+                    return (true, datos, "");
+                }
+                var error = JsonSerializer.Deserialize<Dictionary<string, string>>(json, Opts);
+                return (false, null, error?["mensaje"] ?? "Error al registrarse.");
+            }
+            catch (Exception e)
+            {
+                return (false, null, e.Message);
+            }
+        }
+
     }
+
 }
