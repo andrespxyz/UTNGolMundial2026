@@ -73,9 +73,8 @@ namespace EstadisticasAPI.Controllers
             partido.GolesVisitante = resultado.GolesVisitante;
             partido.Estado = "finalizado";
 
-            // Actualizar estadísticas selecciones
-            var local = partido.SeleccionLocal;
-            var visitante = partido.SeleccionVisitante;
+            var local = partido.SeleccionLocal!;
+            var visitante = partido.SeleccionVisitante!;
 
             local.PartidosJugados++;
             visitante.PartidosJugados++;
@@ -84,23 +83,42 @@ namespace EstadisticasAPI.Controllers
             visitante.GolesFavor += resultado.GolesVisitante;
             visitante.GolesContra += resultado.GolesLocal;
 
+            string resultadoReal;
             if (resultado.GolesLocal > resultado.GolesVisitante)
             {
                 local.PartidosGanados++; local.Puntos += 3;
                 visitante.PartidosPerdidos++;
+                resultadoReal = "LOCAL";
             }
             else if (resultado.GolesLocal < resultado.GolesVisitante)
             {
                 visitante.PartidosGanados++; visitante.Puntos += 3;
                 local.PartidosPerdidos++;
+                resultadoReal = "VISITANTE";
             }
             else
             {
                 local.PartidosEmpatados++; local.Puntos++;
                 visitante.PartidosEmpatados++; visitante.Puntos++;
+                resultadoReal = "EMPATE";
             }
 
             await _context.SaveChangesAsync();
+
+            // Notificar al UTNGolCoinAPI para liquidar predicciones
+            try
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => true
+                };
+                using var http = new HttpClient(handler);
+                var body = System.Text.Json.JsonSerializer.Serialize(new { resultadoReal });
+                var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                await http.PostAsync($"http://localhost:8080/UTNGolCoinAPI/api/predicciones/liquidar/{id}", content);
+            }
+            catch { /* degradación controlada: si UTNGolCoin no responde, el resultado igual se guarda */ }
+
             return NoContent();
         }
 
