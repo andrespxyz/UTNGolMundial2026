@@ -1,0 +1,103 @@
+﻿@model List<PublicFrontend.Models.Transaccion>
+@{
+    ViewData["Title"] = "Mi Billetera";
+    var billetera = ViewBag.Billetera as PublicFrontend.Models.Billetera;
+    var predicciones = ViewBag.Predicciones as List<PublicFrontend.Models.Prediccion>;
+}
+
+<div class="container">
+    <h2 class="section-title"> Mi Billetera UTNGolCoin</h2>
+
+    @if (billetera != null)
+    {
+        <div class="billetera-card">
+            <div>
+                <div class="billetera-label">Saldo disponible</div>
+                <div class="billetera-saldo">@billetera.Saldo</div>
+                <div class="billetera-label" style="margin-top:4px">UTNGolCoin — @billetera.NombreUsuario</div>
+            </div>
+        </div>
+    }
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <div>
+            <h3 class="section-title" style="font-size:20px"> Historial de Transacciones</h3>
+            @if (Model.Any())
+            {
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Monto</th>
+                            <th>Descripción</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge @(t.Tipo == "PREMIO" ? "badge-green" : t.Tipo == "PREDICCION" ? "badge-red" : "badge-gray")">
+                                        @t.Tipo
+                                    </span>
+                                </td>
+                                <td style="color:@(t.Monto > 0 ? "#44ff44" : "#ff4444"); font-weight:700;">
+                                    @(t.Monto > 0 ? "+" : "")@t.Monto
+                                </td>
+                                <td>@t.Descripcion</td>
+                                <td style="font-size:12px; color:#666">@t.FechaHora</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="card" style="text-align:center; color:#666; padding:40px">
+                    <p>No hay transacciones aún.</p>
+                </div>
+            }
+        </div>
+
+        <div>
+            <h3 class="section-title" style="font-size:20px"> Mis Predicciones</h3>
+            @if (predicciones != null && predicciones.Any())
+            {
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Partido</th>
+                            <th>Pronóstico</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pred in predicciones)
+                        {
+                            <tr>
+                                <td>#@pred.PartidoId</td>
+                                <td>@pred.Pronostico</td>
+                                <td>@pred.Monto UGC</td>
+                                <td>
+                                    <span class="badge @(pred.Estado == "GANADA" ? "badge-green" : pred.Estado == "PERDIDA" ? "badge-red" : "badge-gray")">
+                                        @pred.Estado
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="card" style="text-align:center; color:#666; padding:40px">
+                    <p>No has hecho predicciones aún.</p>
+                    <br />
+                    <a class="btn btn-red" asp-controller="Predicciones" asp-action="Index">Predecir ahora</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

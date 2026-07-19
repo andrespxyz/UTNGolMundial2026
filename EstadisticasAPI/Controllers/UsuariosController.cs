@@ -57,5 +57,30 @@ namespace EstadisticasAPI.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpGet("por-rol/{rol}")]
+        public async Task<ActionResult<IEnumerable<Usuario>>> GetPorRol(string rol)
+        {
+            return await _context.Usuarios
+                .Where(u => u.Rol == rol && u.Activo)
+                .OrderBy(u => u.NombreUsuario)
+                .ToListAsync();
+        }
+
+        [HttpPost("cambiar-password")]
+        public async Task<IActionResult> CambiarPassword([FromBody] CambiarPasswordDto dto)
+        {
+            var usuario = await _context.Usuarios.FindAsync(dto.Id);
+            if (usuario == null) return NotFound();
+            usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NuevaPassword);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        public class CambiarPasswordDto
+        {
+            public int Id { get; set; }
+            public string NuevaPassword { get; set; } = string.Empty;
+        }
     }
 }

@@ -65,5 +65,24 @@ namespace EstadisticasAPI.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpGet("{id}/estadisticas")]
+        public async Task<ActionResult<Seleccion>> GetEstadisticas(int id)
+        {
+            var seleccion = await _context.Selecciones.FindAsync(id);
+            if (seleccion == null) return NotFound();
+            return seleccion;
+        }
+
+        [HttpGet("grupos")]
+        public async Task<ActionResult<IEnumerable<string>>> GetGrupos()
+        {
+            var grupos = await _context.Selecciones
+                .Select(s => s.Grupo)
+                .Distinct()
+                .OrderBy(g => g)
+                .ToListAsync();
+            return Ok(grupos);
+        }
     }
 }

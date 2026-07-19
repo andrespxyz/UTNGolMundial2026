@@ -1,0 +1,59 @@
+﻿@model List<PublicFrontend.Models.Seleccion>
+@{
+    ViewData["Title"] = "Estadísticas";
+    var grupos = Model.GroupBy(s => s.Grupo).OrderBy(g => g.Key);
+}
+
+<div class="container">
+    <h2 class="section-title">📊 Estadísticas por Selección</h2>
+
+    @foreach (var grupo in grupos)
+    {
+        <div class="grupo-table">
+            <div class="grupo-header">GRUPO @grupo.Key</div>
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Selección</th>
+                        <th>Cód</th>
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PE</th>
+                        <th>PP</th>
+                        <th>GF</th>
+                        <th>GC</th>
+                        <th>DIF</th>
+                        <th>PTS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int pos = 1;
+                    }
+                    @foreach (var s in grupo.OrderByDescending(x => x.Puntos)
+                        .ThenByDescending(x => x.GolesFavor - x.GolesContra)
+                        .ThenByDescending(x => x.GolesFavor))
+                    {
+                        <tr>
+                            <td style="font-weight:700; color:@(pos <= 2 ? "#CC0000" : "#666")">@pos</td>
+                            <td style="font-weight:700; color:#fff">@s.Nombre</td>
+                            <td style="color:#CC0000; font-weight:700">@s.Codigo</td>
+                            <td>@s.PartidosJugados</td>
+                            <td>@s.PartidosGanados</td>
+                            <td>@s.PartidosEmpatados</td>
+                            <td>@s.PartidosPerdidos</td>
+                            <td>@s.GolesFavor</td>
+                            <td>@s.GolesContra</td>
+                            <td style="color:@(s.GolesFavor - s.GolesContra > 0 ? "#44ff44" : s.GolesFavor - s.GolesContra < 0 ? "#ff4444" : "#aaa")">
+                                @(s.GolesFavor - s.GolesContra > 0 ? "+" : "")@(s.GolesFavor - s.GolesContra)
+                            </td>
+                            <td style="font-weight:900; color:#CC0000; font-size:16px">@s.Puntos</td>
+                        </tr>
+                        pos++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

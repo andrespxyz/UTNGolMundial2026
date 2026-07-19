@@ -5,6 +5,14 @@
 <div class="hero">
     <h1>UTN <span>GolMundial</span> 2026</h1>
     <p>Sigue cada partido, predice resultados y gana UTNGolCoin</p>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-error" style="max-width:600px; margin:0 auto 24px;">
+            ⚠️ @ViewBag.Error
+        </div>
+    }
+
     <div class="stats-bar">
         <div class="stat-item">
             <div class="num">@ViewBag.TotalSelecciones</div>
@@ -19,37 +27,62 @@
             <div class="lbl">Finalizados</div>
         </div>
         <div class="stat-item">
-            <div class="num">3</div>
-            <div class="lbl">Países Sede</div>
+            <div class="num">@ViewBag.PartidosProgramados</div>
+            <div class="lbl">Programados</div>
         </div>
     </div>
+
     <a class="btn btn-red" asp-controller="Calendario" asp-action="Index">Ver Calendario</a>
     &nbsp;
     <a class="btn btn-outline" asp-controller="Posiciones" asp-action="Index">Ver Posiciones</a>
+    &nbsp;
+    @if (Context.Session.GetString("NombreUsuario") == null)
+    {
+        <a class="btn btn-outline" asp-controller="Auth" asp-action="Registro">
+            🎯 Jugar con UTNGolCoin
+        </a>
+    }
 </div>
 
 <div class="container">
-    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:20px;">
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:20px; margin-bottom:32px;">
         <div class="card">
-            <div style="font-size:36px; margin-bottom:12px">📅</div>
             <h3 style="color:#CC0000; margin-bottom:8px">Calendario</h3>
             <p style="color:#aaa; font-size:14px">Consulta todos los partidos del Mundial con fechas, horarios y sedes.</p>
             <br />
             <a class="btn btn-outline" asp-controller="Calendario" asp-action="Index">Ver partidos</a>
         </div>
         <div class="card">
-            <div style="font-size:36px; margin-bottom:12px">🏆</div>
             <h3 style="color:#CC0000; margin-bottom:8px">Posiciones</h3>
-            <p style="color:#aaa; font-size:14px">Tablas actualizadas de todos los grupos del torneo en tiempo real.</p>
+            <p style="color:#aaa; font-size:14px">Tablas actualizadas de todos los grupos del torneo.</p>
             <br />
             <a class="btn btn-outline" asp-controller="Posiciones" asp-action="Index">Ver grupos</a>
         </div>
         <div class="card">
-            <div style="font-size:36px; margin-bottom:12px">🎯</div>
-            <h3 style="color:#CC0000; margin-bottom:8px">Predicciones</h3>
-            <p style="color:#aaa; font-size:14px">Usa tus UTNGolCoin para predecir resultados y ganar premios.</p>
+            <h3 style="color:#CC0000; margin-bottom:8px">Estadísticas</h3>
+            <p style="color:#aaa; font-size:14px">Rendimiento de cada selección: goles, puntos y más.</p>
             <br />
-            <a class="btn btn-outline" asp-controller="Predicciones" asp-action="Index">Predecir</a>
+            <a class="btn btn-outline" asp-controller="Estadisticas" asp-action="Index">Ver stats</a>
         </div>
     </div>
+
+    @if (Context.Session.GetString("NombreUsuario") == null)
+    {
+        <div class="card" style="background:linear-gradient(135deg,#1a0000,#2a0000); border:2px solid #CC0000; text-align:center; padding:40px;">
+            <h3 style="color:#fff; font-size:24px; margin-bottom:8px">¿Listo para predecir?</h3>
+            <p style="color:#aaa; margin-bottom:24px">Regístrate gratis y recibe <strong style="color:#CC0000">10 UTNGolCoin</strong> de bienvenida para empezar a predecir resultados.</p>
+            <a class="btn btn-red" asp-controller="Auth" asp-action="Registro" style="margin-right:12px">Crear cuenta gratis</a>
+            <a class="btn btn-outline" asp-controller="Auth" asp-action="Login">Ya tengo cuenta</a>
+        </div>
+    }
+    else
+    {
+        <div class="card" style="background:linear-gradient(135deg,#1a0000,#2a0000); border:2px solid #CC0000; text-align:center; padding:40px;">
+            <h3 style="color:#fff; font-size:24px; margin-bottom:8px">
+                Bienvenido, <span style="color:#CC0000">@Context.Session.GetString("NombreUsuario")</span>
+            </h3>
+            <p style="color:#aaa; margin-bottom:24px">Saldo actual: <strong style="color:#CC0000">@Context.Session.GetString("Saldo") UTNGolCoin</strong></p>
+            <a class="btn btn-red" asp-controller="Predicciones" asp-action="Index">Ir a predicciones</a>
+        </div>
+    }
 </div>

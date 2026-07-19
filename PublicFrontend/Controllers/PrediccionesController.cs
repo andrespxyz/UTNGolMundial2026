@@ -17,13 +17,17 @@ namespace PublicFrontend.Controllers
         public async Task<IActionResult> Index()
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (usuarioId == null) return RedirectToAction("Index", "Home");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
 
             var partidos = await _estadisticas.GetPartidosAsync();
             var billetera = await _golcoin.GetBilleteraAsync(usuarioId.Value);
             var predicciones = billetera != null
                 ? await _golcoin.GetPrediccionesAsync(billetera.Id)
                 : new();
+
+            // Actualizar saldo en sesión
+            if (billetera != null)
+                HttpContext.Session.SetString("Saldo", billetera.Saldo.ToString("F2"));
 
             ViewBag.Billetera = billetera;
             ViewBag.Predicciones = predicciones;

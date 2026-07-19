@@ -1,7 +1,8 @@
-﻿using System.Net.Http;
+﻿using PublicFrontend.Models;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using PublicFrontend.Models;
+using System.Transactions;
 
 namespace PublicFrontend.Services
 {
@@ -86,6 +87,16 @@ namespace PublicFrontend.Services
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
+        }
+
+        public async Task<List<Transaccion>> GetTransaccionesAsync(int billeteraId)
+        {
+            try
+            {
+                var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/{billeteraId}/transacciones");
+                return JsonSerializer.Deserialize<List<Transaccion>>(json, Opts) ?? new();
+            }
+            catch { return new(); }
         }
     }
 }

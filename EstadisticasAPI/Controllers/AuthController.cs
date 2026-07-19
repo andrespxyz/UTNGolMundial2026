@@ -68,6 +68,12 @@ namespace EstadisticasAPI.Controllers
                 rol = usuario.Rol
             });
         }
+
+        [HttpGet("genhash/{password}")]
+        public IActionResult GenHash(string password)
+        {
+            return Ok(BCrypt.Net.BCrypt.HashPassword(password));
+        }
     }
 
     public class LoginDto
