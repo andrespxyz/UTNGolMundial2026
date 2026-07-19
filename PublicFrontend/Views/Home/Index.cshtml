@@ -1,7 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
 }
-
+@if (TempData["Aviso"] != null)
+{
+    <div class="alert alert-error" style="margin:16px 32px;">⚠️ @TempData["Aviso"]</div>
+}
 <div class="hero">
     <h1>UTN <span>GolMundial</span> 2026</h1>
     <p>Sigue cada partido, predice resultados y gana UTNGolCoin</p>

@@ -16,13 +16,11 @@
             <a class="nav-link" asp-controller="Estadisticas" asp-action="Index"> Estadísticas</a>
             <a class="nav-link" asp-controller="Predicciones" asp-action="Index"> Predicciones</a>
             <a class="nav-link" asp-controller="Ranking" asp-action="Index"> Ranking</a>
-            <a class="nav-link" asp-controller="Billetera" asp-action="Index"> Billetera</a>
             @if (Context.Session.GetString("NombreUsuario") != null)
             {
-                <a class="nav-link" asp-controller="Predicciones" asp-action="Index">🎯 Predicciones</a>
-                <a class="nav-link" asp-controller="Estadisticas" asp-action="Index">📊 Estadísticas</a>
+                <a class="nav-link" asp-controller="Billetera" asp-action="Index"> Billetera</a>
                 <span style="color:#CC0000; padding:8px 12px; font-size:14px; font-weight:700;">
-                    💰 @Context.Session.GetString("Saldo") UGC
+                    💰 @Context.Session.GetString("Saldo") UTN-GC
                 </span>
                 <span style="color:#aaa; padding:8px 12px; font-size:14px;">
                     👤 @Context.Session.GetString("NombreUsuario")
@@ -32,8 +30,6 @@
             }
             else
             {
-                <a class="nav-link" style="color:#aaa;">🎯 Predicciones</a>
-                <a class="nav-link" asp-controller="Estadisticas" asp-action="Index">📊 Estadísticas</a>
                 <a class="nav-link" asp-controller="Auth" asp-action="Login">Entrar</a>
                 <a class="nav-link" asp-controller="Auth" asp-action="Registro"
                    style="background:#CC0000; color:#fff; border-radius:6px; padding:8px 16px;">Registrarse</a>

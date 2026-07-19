@@ -72,7 +72,8 @@ namespace EstadisticasAPI.Controllers
         [HttpGet("genhash/{password}")]
         public IActionResult GenHash(string password)
         {
-            return Ok(BCrypt.Net.BCrypt.HashPassword(password));
+            string hash = BCrypt.Net.BCrypt.HashPassword(password);
+            return Ok(new { password, hash });
         }
     }
 

@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Transactions;
 
 namespace PublicFrontend.Services
 {
@@ -25,7 +24,11 @@ namespace PublicFrontend.Services
                 var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/usuario/{usuarioId}");
                 return JsonSerializer.Deserialize<Billetera>(json, Opts);
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] GetBilleteraAsync falló: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<List<Billetera>> GetRankingAsync()
@@ -35,7 +38,11 @@ namespace PublicFrontend.Services
                 var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/ranking");
                 return JsonSerializer.Deserialize<List<Billetera>>(json, Opts) ?? new();
             }
-            catch { return new(); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] GetRankingAsync falló: {ex.Message}");
+                return new();
+            }
         }
 
         public async Task<bool> CrearPrediccionAsync(int billeteraId, int partidoId, string pronostico, decimal monto)
@@ -53,7 +60,11 @@ namespace PublicFrontend.Services
                 var response = await _http.PostAsync($"{BaseUrl}/predicciones", content);
                 return response.IsSuccessStatusCode;
             }
-            catch { return false; }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] CrearPrediccionAsync falló: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<List<Prediccion>> GetPrediccionesAsync(int billeteraId)
@@ -63,20 +74,36 @@ namespace PublicFrontend.Services
                 var json = await _http.GetStringAsync($"{BaseUrl}/predicciones/billetera/{billeteraId}");
                 return JsonSerializer.Deserialize<List<Prediccion>>(json, Opts) ?? new();
             }
-            catch { return new(); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] GetPrediccionesAsync falló: {ex.Message}");
+                return new();
+            }
         }
 
-        public async Task<Billetera?> CrearBilleteraAsync(int usuarioId, string nombreUsuario)
+        public async Task<(bool exito, Billetera? billetera)> CrearBilleteraAsync(int usuarioId, string nombreUsuario)
         {
             try
             {
                 var body = JsonSerializer.Serialize(new { usuarioId, nombreUsuario });
-                var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                var content = new StringContent(body, Encoding.UTF8, "application/json");
                 var response = await _http.PostAsync($"{BaseUrl}/billeteras", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[UTNGolCoin] CrearBilleteraAsync respondió {(int)response.StatusCode}");
+                    return (false, null);
+                }
+
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Billetera>(json, Opts);
+                var billetera = JsonSerializer.Deserialize<Billetera>(json, Opts);
+                return (true, billetera);
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] CrearBilleteraAsync excepción: {ex.Message} — ¿WildFly/UTNGolCoinAPI está corriendo?");
+                return (false, null);
+            }
         }
 
         public async Task<bool> AplicarBonoDiarioAsync(int billeteraId)
@@ -86,7 +113,11 @@ namespace PublicFrontend.Services
                 var response = await _http.PostAsync($"{BaseUrl}/billeteras/{billeteraId}/bono-diario", null);
                 return response.IsSuccessStatusCode;
             }
-            catch { return false; }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] AplicarBonoDiarioAsync falló: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<List<Transaccion>> GetTransaccionesAsync(int billeteraId)
@@ -96,7 +127,11 @@ namespace PublicFrontend.Services
                 var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/{billeteraId}/transacciones");
                 return JsonSerializer.Deserialize<List<Transaccion>>(json, Opts) ?? new();
             }
-            catch { return new(); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UTNGolCoin] GetTransaccionesAsync falló: {ex.Message}");
+                return new();
+            }
         }
     }
 }

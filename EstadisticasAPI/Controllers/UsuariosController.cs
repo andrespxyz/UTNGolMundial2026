@@ -17,17 +17,39 @@ namespace EstadisticasAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
+        public async Task<IActionResult> GetUsuarios()
         {
-            return await _context.Usuarios.ToListAsync();
+            var usuarios = await _context.Usuarios
+                .Select(u => new
+                {
+                    id = u.Id,
+                    nombreUsuario = u.NombreUsuario,
+                    email = u.Email,
+                    rol = u.Rol,
+                    fechaRegistro = u.FechaRegistro,
+                    activo = u.Activo
+                })
+                .ToListAsync();
+            return Ok(usuarios);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> GetUsuario(int id)
+        public async Task<IActionResult> GetUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _context.Usuarios
+                .Where(u => u.Id == id)
+                .Select(u => new
+                {
+                    id = u.Id,
+                    nombreUsuario = u.NombreUsuario,
+                    email = u.Email,
+                    rol = u.Rol,
+                    fechaRegistro = u.FechaRegistro,
+                    activo = u.Activo
+                })
+                .FirstOrDefaultAsync();
             if (usuario == null) return NotFound();
-            return usuario;
+            return Ok(usuario);
         }
 
         [HttpPost]

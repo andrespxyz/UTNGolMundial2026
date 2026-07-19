@@ -39,10 +39,18 @@ namespace PublicFrontend.Controllers
             HttpContext.Session.SetString("NombreUsuario", nombreUsuario);
             HttpContext.Session.SetString("Rol", rol);
 
-            // Aplicar bono diario si saldo es cero
             var billetera = await _golcoin.GetBilleteraAsync(usuarioId);
-            if (billetera != null && billetera.Saldo == 0)
-                await _golcoin.AplicarBonoDiarioAsync(billetera.Id);
+            if (billetera != null)
+            {
+                if (billetera.Saldo == 0)
+                    await _golcoin.AplicarBonoDiarioAsync(billetera.Id);
+
+                HttpContext.Session.SetString("Saldo", billetera.Saldo.ToString("F2"));
+            }
+            else
+            {
+                TempData["Aviso"] = "No se pudo cargar tu billetera. Verifica que UTNGolCoinAPI esté disponible.";
+            }
 
             return RedirectToAction("Index", "Home");
         }
@@ -61,12 +69,21 @@ namespace PublicFrontend.Controllers
             var dict = datos as Dictionary<string, JsonElement>;
             int usuarioId = dict!["id"].GetInt32();
 
-            // Crear billetera con 10 UTNGolCoin de bienvenida
-            await _golcoin.CrearBilleteraAsync(usuarioId, nombreUsuario);
+            var (billeteraOk, billetera) = await _golcoin.CrearBilleteraAsync(usuarioId, nombreUsuario);
 
             HttpContext.Session.SetInt32("UsuarioId", usuarioId);
             HttpContext.Session.SetString("NombreUsuario", nombreUsuario);
             HttpContext.Session.SetString("Rol", "usuario");
+
+            if (billeteraOk && billetera != null)
+            {
+                HttpContext.Session.SetString("Saldo", billetera.Saldo.ToString("F2"));
+            }
+            else
+            {
+                TempData["Aviso"] = "Tu cuenta se creó, pero no se pudo generar tu billetera UTNGolCoin. " +
+                                     "Verifica que UTNGolCoinAPI (WildFly) esté corriendo e inicia sesión de nuevo.";
+            }
 
             return RedirectToAction("Index", "Home");
         }
