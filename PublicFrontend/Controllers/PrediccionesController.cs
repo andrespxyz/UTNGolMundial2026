@@ -17,7 +17,7 @@ namespace PublicFrontend.Controllers
         public async Task<IActionResult> Index()
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+            if (usuarioId == null) return RedirectToAction("Index", "Home");
 
             var partidos = await _estadisticas.GetPartidosAsync();
             var billetera = await _golcoin.GetBilleteraAsync(usuarioId.Value);
@@ -25,13 +25,21 @@ namespace PublicFrontend.Controllers
                 ? await _golcoin.GetPrediccionesAsync(billetera.Id)
                 : new();
 
-            // Actualizar saldo en sesión
-            if (billetera != null)
-                HttpContext.Session.SetString("Saldo", billetera.Saldo.ToString("F2"));
-
             ViewBag.Billetera = billetera;
             ViewBag.Predicciones = predicciones;
-            return View(partidos.Where(p => p.Estado != "finalizado").ToList());
+
+            var disponibles = partidos.Where(p =>
+            {
+                if (p.Estado == "finalizado") return false;
+                if (DateTime.TryParse(p.FechaHora, null,
+                        System.Globalization.DateTimeStyles.RoundtripKind, out var inicio))
+                {
+                    return DateTime.UtcNow < inicio; // oculta partidos que ya empezaron
+                }
+                return true; // si no se puede parsear la fecha, no lo ocultamos por eso
+            }).ToList();
+
+            return View(disponibles);
         }
 
         [HttpPost]
@@ -47,10 +55,12 @@ namespace PublicFrontend.Controllers
                 return RedirectToAction("Index");
             }
 
-            var ok = await _golcoin.CrearPrediccionAsync(billetera.Id, partidoId, pronostico, monto);
-            TempData[ok ? "Exito" : "Error"] = ok
-                ? "¡Predicción registrada correctamente!"
-                : "Error al registrar la predicción. Verifica tu saldo.";
+            var partidos = await _estadisticas.GetPartidosAsync();
+            var partido = partidos.FirstOrDefault(p => p.Id == partidoId);
+            var fechaHoraPartido = partido?.FechaHora ?? "";
+
+            var (ok, mensaje) = await _golcoin.CrearPrediccionAsync(billetera.Id, partidoId, pronostico, monto, fechaHoraPartido);
+            TempData[ok ? "Exito" : "Error"] = mensaje;
 
             return RedirectToAction("Index");
         }

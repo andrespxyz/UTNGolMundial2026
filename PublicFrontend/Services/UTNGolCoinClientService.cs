@@ -45,7 +45,7 @@ namespace PublicFrontend.Services
             }
         }
 
-        public async Task<bool> CrearPrediccionAsync(int billeteraId, int partidoId, string pronostico, decimal monto)
+        public async Task<(bool exito, string mensaje)> CrearPrediccionAsync(int billeteraId, int partidoId, string pronostico, decimal monto, string fechaHoraPartido)
         {
             try
             {
@@ -54,16 +54,22 @@ namespace PublicFrontend.Services
                     billeteraId = billeteraId.ToString(),
                     partidoId = partidoId.ToString(),
                     pronostico,
-                    monto = monto.ToString()
+                    monto = monto.ToString(),
+                    fechaHoraPartido
                 });
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
                 var response = await _http.PostAsync($"{BaseUrl}/predicciones", content);
-                return response.IsSuccessStatusCode;
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                    return (true, "¡Predicción registrada correctamente!");
+
+                return (false, responseBody.Trim('"'));
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[UTNGolCoin] CrearPrediccionAsync falló: {ex.Message}");
-                return false;
+                return (false, "No se pudo conectar con UTNGolCoinAPI.");
             }
         }
 
