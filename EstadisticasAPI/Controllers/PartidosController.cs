@@ -5,6 +5,7 @@ using EstadisticasAPI.Models;
 using EstadisticasAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace EstadisticasAPI.Controllers
 {
@@ -82,6 +83,11 @@ namespace EstadisticasAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Partido>> PostPartido(Partido partido)
         {
+            if (partido.SeleccionLocalId == partido.SeleccionVisitanteId)
+            {
+                return BadRequest(new { mensaje = "El equipo local y el equipo visitante no pueden ser la misma selección." });
+            }
+
             _context.Partidos.Add(partido);
             await _context.SaveChangesAsync();
             await AuditoriaHelper.RegistrarAsync(_context, Request, "CREAR_PARTIDO", $"Partido #{partido.Id} creado");
@@ -91,6 +97,10 @@ namespace EstadisticasAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPartido(int id, Partido partido)
         {
+            if (partido.SeleccionLocalId == partido.SeleccionVisitanteId)
+            {
+                return BadRequest(new { mensaje = "El equipo local y el equipo visitante no pueden ser la misma selección." });
+            }
             var existente = await _context.Partidos.FindAsync(id);
             if (existente == null) return NotFound();
 
@@ -130,11 +140,26 @@ namespace EstadisticasAPI.Controllers
             return NoContent();
         }
 
+        private static readonly string[] EstadosValidos = { "programado", "en_juego", "finalizado" };
+
         [HttpPut("{id}/estado")]
         public async Task<IActionResult> ActualizarEstado(int id, [FromBody] EstadoDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Estado) || !EstadosValidos.Contains(dto.Estado))
+            {
+                return BadRequest(new { mensaje = $"Estado inválido. Valores permitidos: {string.Join(", ", EstadosValidos)}." });
+            }
+
             var partido = await _context.Partidos.FindAsync(id);
             if (partido == null) return NotFound();
+
+            // Un partido finalizado no puede volver atrás por acá: si se pudiera,
+            // se podría re-registrar el resultado y duplicar puntos/goles y el
+            // pago de predicciones (bypass del control de idempotencia de /resultado).
+            if (partido.Estado == "finalizado" && dto.Estado != "finalizado")
+            {
+                return BadRequest(new { mensaje = "No se puede revertir el estado de un partido finalizado." });
+            }
 
             partido.Estado = dto.Estado;
             await _context.SaveChangesAsync();

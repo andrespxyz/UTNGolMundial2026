@@ -42,10 +42,16 @@
         <div class="partido-card" style="flex-direction:column; align-items:stretch;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
                 <div class="equipo">
+                    <div class="equipo-tag" style="font-size:11px; color:#CC0000; font-weight:700; letter-spacing:1px; margin-bottom:4px;">
+                         LOCAL
+                    </div>
                     <div class="equipo-nombre">@(p.SeleccionLocal?.Nombre ?? "TBD")</div>
                 </div>
                 <div class="marcador" style="font-size:18px; color:#666">VS</div>
                 <div class="equipo">
+                    <div class="equipo-tag" style="font-size:11px; color:#888; font-weight:700; letter-spacing:1px; margin-bottom:4px;">
+                         VISITANTE
+                    </div>
                     <div class="equipo-nombre">@(p.SeleccionVisitante?.Nombre ?? "TBD")</div>
                 </div>
             </div>
@@ -57,9 +63,9 @@
                     <div class="form-group" style="margin:0">
                         <label>Pronóstico</label>
                         <select name="pronostico" class="form-control" style="width:160px">
-                            <option value="LOCAL">🏠 Gana Local</option>
-                            <option value="EMPATE">🤝 Empate</option>
-                            <option value="VISITANTE">✈️ Gana Visitante</option>
+                            <option value="LOCAL"> Gana Local</option>
+                            <option value="EMPATE"> Empate</option>
+                            <option value="VISITANTE"> Gana Visitante</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin:0">
