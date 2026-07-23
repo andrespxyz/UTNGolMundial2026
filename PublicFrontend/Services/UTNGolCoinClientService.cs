@@ -10,7 +10,9 @@ namespace PublicFrontend.Services
     {
         private readonly HttpClient _http;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private const string BaseUrl = "http://192.168.10.12:8080/UTNGolCoinAPI/api";
+        private const string BaseUrl = "http://localhost:8080/UTNGolCoinAPI/api";
+        //private const string BaseUrl = "http://192.168.10.12:8080/UTNGolCoinAPI/api";
+
 
         public UTNGolCoinClientService(IHttpContextAccessor httpContextAccessor)
         {
