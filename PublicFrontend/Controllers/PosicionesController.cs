@@ -15,15 +15,7 @@ namespace PublicFrontend.Controllers
         public async Task<IActionResult> Index()
         {
             var selecciones = await _estadisticas.GetSeleccionesAsync();
-            var grupos = selecciones
-                .GroupBy(s => s.Grupo)
-                .OrderBy(g => g.Key)
-                .ToDictionary(g => g.Key, g => g
-                    .OrderByDescending(s => s.Puntos)
-                    .ThenByDescending(s => s.GolesFavor - s.GolesContra)
-                    .ThenByDescending(s => s.GolesFavor)
-                    .ToList());
-            return View(grupos);
+            return View(selecciones);
         }
     }
 }

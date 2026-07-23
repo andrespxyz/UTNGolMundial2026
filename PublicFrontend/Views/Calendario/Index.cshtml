@@ -1,44 +1,68 @@
 ﻿@model List<PublicFrontend.Models.Partido>
 @{
     ViewData["Title"] = "Calendario";
-    var grupos = Model.GroupBy(p => p.Grupo).OrderBy(g => g.Key);
+
+    var nombresFase = new Dictionary<string, string>
+    {
+        { "Dieciseisavos", "32avos de Final" },
+        { "Octavos", "16avos de Final" },
+        { "Cuartos", "8vos de Final" },
+        { "Semifinal", "4tos de Final" },
+        { "TercerPuesto", "Tercer Puesto" },
+        { "Final", "Final" }
+    };
+
+    var ordenFases = new[] { "Dieciseisavos", "Octavos", "Cuartos", "Semifinal", "TercerPuesto", "Final" };
+
+    var gruposDeFase = Model.Where(p => p.Fase == "Grupos")
+        .GroupBy(p => p.Grupo)
+        .OrderBy(g => g.Key)
+        .Select(g => (titulo: $"Grupo {g.Key}", partidos: g.OrderBy(x => x.FechaHora).ToList()));
+
+    var eliminatorias = Model.Where(p => p.Fase != "Grupos")
+        .GroupBy(p => p.Fase)
+        .OrderBy(g => Array.IndexOf(ordenFases, g.Key))
+        .Select(g => (titulo: nombresFase.ContainsKey(g.Key) ? nombresFase[g.Key] : g.Key,
+                       partidos: g.OrderBy(x => x.FechaHora).ToList()));
+
+    var todosLosGrupos = gruposDeFase.Concat(eliminatorias);
 }
 
 <div class="container">
-    <h2 class="section-title">📅 Calendario del Mundial 2026</h2>
+    <h2 class="section-title"> Calendario del Mundial 2026</h2>
 
-    @foreach (var grupo in grupos)
+    @foreach (var grupo in todosLosGrupos)
     {
         <h3 style="color:#CC0000; margin: 24px 0 12px; font-size:18px">
-            @(grupo.Key == "" ? "Fase Eliminatoria" : $"Grupo {grupo.Key}")
+            @grupo.titulo
         </h3>
-        @foreach (var p in grupo.OrderBy(x => x.FechaHora))
+        @foreach (var p in grupo.partidos)
         {
             <a href="@Url.Action("Detalle", "Calendario", new { id = p.Id })" style="text-decoration:none; color:inherit;">
-            <div class="partido-card">
-                <div class="equipo">
-                    <div class="equipo-nombre">@(p.SeleccionLocal?.Nombre ?? "TBD")</div>
-                    <div class="equipo-codigo">@(p.SeleccionLocal?.Codigo ?? "")</div>
+                <div class="partido-card">
+                    <div class="equipo">
+                        <div class="equipo-nombre">@(p.SeleccionLocal?.Nombre ?? "TBD")</div>
+                        <div class="equipo-codigo">@(p.SeleccionLocal?.Codigo ?? "")</div>
+                    </div>
+                    <div style="text-align:center; padding: 0 16px;">
+                        @if (p.Estado == "finalizado")
+                        {
+                            <div class="marcador">@p.GolesLocal - @p.GolesVisitante</div>
+                            <span class="badge badge-green">Finalizado</span>
+                        }
+                        else
+                        {
+                            <div class="marcador" style="font-size:20px; color:#666">VS</div>
+                            <span class="badge badge-gray">Programado</span>
+                        }
+                        <div class="partido-info">@p.FechaHora</div>
+                        <div class="partido-info">📍 @(p.Sede?.Ciudad ?? "")</div>
+                    </div>
+                    <div class="equipo">
+                        <div class="equipo-nombre">@(p.SeleccionVisitante?.Nombre ?? "TBD")</div>
+                        <div class="equipo-codigo">@(p.SeleccionVisitante?.Codigo ?? "")</div>
+                    </div>
                 </div>
-                <div style="text-align:center; padding: 0 16px;">
-                    @if (p.Estado == "finalizado")
-                    {
-                        <div class="marcador">@p.GolesLocal - @p.GolesVisitante</div>
-                        <span class="badge badge-green">Finalizado</span>
-                    }
-                    else
-                    {
-                        <div class="marcador" style="font-size:20px; color:#666">VS</div>
-                        <span class="badge badge-gray">Programado</span>
-                    }
-                    <div class="partido-info">@p.FechaHora</div>
-                    <div class="partido-info">📍 @(p.Sede?.Ciudad ?? "")</div>
-                </div>
-                <div class="equipo">
-                    <div class="equipo-nombre">@(p.SeleccionVisitante?.Nombre ?? "TBD")</div>
-                    <div class="equipo-codigo">@(p.SeleccionVisitante?.Codigo ?? "")</div>
-                </div>
-            </div>
             </a>
         }
     }

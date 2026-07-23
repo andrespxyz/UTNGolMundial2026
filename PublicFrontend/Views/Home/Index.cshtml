@@ -61,12 +61,7 @@
             <br />
             <a class="btn btn-outline" asp-controller="Posiciones" asp-action="Index">Ver grupos</a>
         </div>
-        <div class="card">
-            <h3 style="color:#CC0000; margin-bottom:8px">Estadísticas</h3>
-            <p style="color:#aaa; font-size:14px">Rendimiento de cada selección: goles, puntos y más.</p>
-            <br />
-            <a class="btn btn-outline" asp-controller="Estadisticas" asp-action="Index">Ver stats</a>
-        </div>
+
     </div>
 
     @if (Context.Session.GetString("NombreUsuario") == null)
