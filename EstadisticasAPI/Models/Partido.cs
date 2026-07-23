@@ -23,7 +23,7 @@ namespace EstadisticasAPI.Models
         [Required, StringLength(30)]
         public string Fase { get; set; } = string.Empty;
 
-        [StringLength(2)]
+        [StringLength(10)]
         public string Grupo { get; set; } = string.Empty;
 
         public string Estado { get; set; } = "programado";
