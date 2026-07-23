@@ -75,7 +75,7 @@ namespace EstadisticasAPI.Services
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _jwt.GenerarTokenSistema());
                 var body = System.Text.Json.JsonSerializer.Serialize(new { resultadoReal });
                 var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                await http.PostAsync($"http://localhost:8080/UTNGolCoinAPI/api/predicciones/liquidar/{partidoId}", content);
+                await http.PostAsync($"http://192.168.10.12:8080/UTNGolCoinAPI/api/predicciones/liquidar/{partidoId}", content);
             }
             catch { /* degradación controlada: si UTNGolCoin no responde, el resultado igual se guarda */ }
         }
