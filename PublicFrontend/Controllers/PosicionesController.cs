@@ -18,7 +18,11 @@ namespace PublicFrontend.Controllers
             var grupos = selecciones
                 .GroupBy(s => s.Grupo)
                 .OrderBy(g => g.Key)
-                .ToDictionary(g => g.Key, g => g.OrderByDescending(s => s.Puntos).ToList());
+                .ToDictionary(g => g.Key, g => g
+                    .OrderByDescending(s => s.Puntos)
+                    .ThenByDescending(s => s.GolesFavor - s.GolesContra)
+                    .ThenByDescending(s => s.GolesFavor)
+                    .ToList());
             return View(grupos);
         }
     }

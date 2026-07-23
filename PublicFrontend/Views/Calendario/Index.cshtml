@@ -14,6 +14,7 @@
         </h3>
         @foreach (var p in grupo.OrderBy(x => x.FechaHora))
         {
+            <a href="@Url.Action("Detalle", "Calendario", new { id = p.Id })" style="text-decoration:none; color:inherit;">
             <div class="partido-card">
                 <div class="equipo">
                     <div class="equipo-nombre">@(p.SeleccionLocal?.Nombre ?? "TBD")</div>
@@ -38,6 +39,7 @@
                     <div class="equipo-codigo">@(p.SeleccionVisitante?.Codigo ?? "")</div>
                 </div>
             </div>
+            </a>
         }
     }
 

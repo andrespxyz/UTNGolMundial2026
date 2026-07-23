@@ -1,7 +1,9 @@
 ﻿using EstadisticasAPI.Data;
 using EstadisticasAPI.Models;
+using EstadisticasAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace EstadisticasAPI.Controllers
 {
@@ -10,10 +12,12 @@ namespace EstadisticasAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly JwtService _jwt;
 
-        public AuthController(AppDbContext context)
+        public AuthController(AppDbContext context, JwtService jwt)
         {
             _context = context;
+            _jwt = jwt;
         }
 
         [HttpPost("login")]
@@ -34,7 +38,8 @@ namespace EstadisticasAPI.Controllers
                 id = usuario.Id,
                 nombreUsuario = usuario.NombreUsuario,
                 email = usuario.Email,
-                rol = usuario.Rol
+                rol = usuario.Rol,
+                token = _jwt.GenerarTokenUsuario(usuario.Id, usuario.Rol)
             });
         }
 
@@ -65,28 +70,30 @@ namespace EstadisticasAPI.Controllers
                 id = usuario.Id,
                 nombreUsuario = usuario.NombreUsuario,
                 email = usuario.Email,
-                rol = usuario.Rol
+                rol = usuario.Rol,
+                token = _jwt.GenerarTokenUsuario(usuario.Id, usuario.Rol)
             });
-        }
-
-        [HttpGet("genhash/{password}")]
-        public IActionResult GenHash(string password)
-        {
-            string hash = BCrypt.Net.BCrypt.HashPassword(password);
-            return Ok(new { password, hash });
         }
     }
 
     public class LoginDto
     {
+        [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
+
+        [Required]
         public string Password { get; set; } = string.Empty;
     }
 
     public class RegistroDto
     {
+        [Required, StringLength(50, MinimumLength = 3)]
         public string NombreUsuario { get; set; } = string.Empty;
+
+        [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
+
+        [Required, StringLength(100, MinimumLength = 6)]
         public string Password { get; set; } = string.Empty;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EstadisticasAPI.Data;
+using EstadisticasAPI.Helpers;
 using EstadisticasAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,13 @@ namespace EstadisticasAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Seleccion>>> GetSelecciones()
         {
-            return await _context.Selecciones.OrderBy(s => s.Grupo).ThenByDescending(s => s.Puntos).ToListAsync();
+            var selecciones = await _context.Selecciones.ToListAsync();
+            return selecciones
+                .OrderBy(s => s.Grupo)
+                .ThenByDescending(s => s.Puntos)
+                .ThenByDescending(s => s.GolesFavor - s.GolesContra)
+                .ThenByDescending(s => s.GolesFavor)
+                .ToList();
         }
 
         [HttpGet("{id}")]
@@ -33,10 +40,12 @@ namespace EstadisticasAPI.Controllers
         [HttpGet("grupo/{grupo}")]
         public async Task<ActionResult<IEnumerable<Seleccion>>> GetPorGrupo(string grupo)
         {
-            return await _context.Selecciones
-                .Where(s => s.Grupo == grupo)
+            var selecciones = await _context.Selecciones.Where(s => s.Grupo == grupo).ToListAsync();
+            return selecciones
                 .OrderByDescending(s => s.Puntos)
-                .ToListAsync();
+                .ThenByDescending(s => s.GolesFavor - s.GolesContra)
+                .ThenByDescending(s => s.GolesFavor)
+                .ToList();
         }
 
         [HttpPost]
@@ -44,15 +53,26 @@ namespace EstadisticasAPI.Controllers
         {
             _context.Selecciones.Add(seleccion);
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "CREAR_SELECCION", $"Selección: {seleccion.Nombre}");
             return CreatedAtAction(nameof(GetSeleccion), new { id = seleccion.Id }, seleccion);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSeleccion(int id, Seleccion seleccion)
         {
-            if (id != seleccion.Id) return BadRequest();
-            _context.Entry(seleccion).State = EntityState.Modified;
+            var existente = await _context.Selecciones.FindAsync(id);
+            if (existente == null) return NotFound();
+
+            // Solo se actualizan los datos básicos de la selección — nunca las
+            // estadísticas acumuladas (PartidosJugados, Puntos, etc.), que las
+            // gestiona exclusivamente RegistrarResultado.
+            existente.Nombre = seleccion.Nombre;
+            existente.Codigo = seleccion.Codigo;
+            existente.Grupo = seleccion.Grupo;
+            existente.Escudo = seleccion.Escudo;
+
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ACTUALIZAR_SELECCION", $"Selección #{id} — {existente.Nombre}");
             return NoContent();
         }
 
@@ -63,6 +83,7 @@ namespace EstadisticasAPI.Controllers
             if (seleccion == null) return NotFound();
             _context.Selecciones.Remove(seleccion);
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ELIMINAR_SELECCION", $"Selección #{id} — {seleccion.Nombre}");
             return NoContent();
         }
 

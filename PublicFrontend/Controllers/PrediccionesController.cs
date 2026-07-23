@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PublicFrontend.Models.ViewModels;
 using PublicFrontend.Services;
 
 namespace PublicFrontend.Controllers
@@ -17,7 +18,7 @@ namespace PublicFrontend.Controllers
         public async Task<IActionResult> Index()
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (usuarioId == null) return RedirectToAction("Index", "Home");
+            if (usuarioId == null) return RedirectToAction("Registro", "Auth");
 
             var partidos = await _estadisticas.GetPartidosAsync();
             var billetera = await _golcoin.GetBilleteraAsync(usuarioId.Value);
@@ -43,10 +44,18 @@ namespace PublicFrontend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Predecir(int partidoId, string pronostico, decimal monto)
+        public async Task<IActionResult> Predecir(PrediccionViewModel model)
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (usuarioId == null) return RedirectToAction("Index", "Home");
+            if (usuarioId == null) return RedirectToAction("Registro", "Auth");
+
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = string.Join(" ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return RedirectToAction("Index");
+            }
 
             var billetera = await _golcoin.GetBilleteraAsync(usuarioId.Value);
             if (billetera == null)
@@ -56,10 +65,10 @@ namespace PublicFrontend.Controllers
             }
 
             var partidos = await _estadisticas.GetPartidosAsync();
-            var partido = partidos.FirstOrDefault(p => p.Id == partidoId);
+            var partido = partidos.FirstOrDefault(p => p.Id == model.PartidoId);
             var fechaHoraPartido = partido?.FechaHora ?? "";
 
-            var (ok, mensaje) = await _golcoin.CrearPrediccionAsync(billetera.Id, partidoId, pronostico, monto, fechaHoraPartido);
+            var (ok, mensaje) = await _golcoin.CrearPrediccionAsync(billetera.Id, model.PartidoId, model.Pronostico, model.Monto, fechaHoraPartido);
             TempData[ok ? "Exito" : "Error"] = mensaje;
 
             return RedirectToAction("Index");

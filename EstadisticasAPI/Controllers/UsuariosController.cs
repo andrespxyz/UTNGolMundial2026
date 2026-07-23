@@ -1,4 +1,5 @@
 ﻿using EstadisticasAPI.Data;
+using EstadisticasAPI.Helpers;
 using EstadisticasAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,8 +54,14 @@ namespace EstadisticasAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<IActionResult> PostUsuario(Usuario usuario)
         {
+            if (await _context.Usuarios.AnyAsync(u => u.Email == usuario.Email))
+                return BadRequest(new { mensaje = "El email ya está registrado." });
+
+            if (await _context.Usuarios.AnyAsync(u => u.NombreUsuario == usuario.NombreUsuario))
+                return BadRequest(new { mensaje = "El nombre de usuario ya existe." });
+
             usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
@@ -64,9 +71,17 @@ namespace EstadisticasAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
         {
-            if (id != usuario.Id) return BadRequest();
-            _context.Entry(usuario).State = EntityState.Modified;
+            var existente = await _context.Usuarios.FindAsync(id);
+            if (existente == null) return NotFound();
+
+            // Solo se actualizan Rol y Activo — nunca tocar PasswordHash/Email/NombreUsuario
+            // desde aquí, porque el llamador (AdminFrontend) no envía esos campos.
+            existente.Rol = usuario.Rol;
+            existente.Activo = usuario.Activo;
+
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ACTUALIZAR_USUARIO",
+                $"Usuario #{id} — rol: {existente.Rol}, activo: {existente.Activo}");
             return NoContent();
         }
 
@@ -77,6 +92,7 @@ namespace EstadisticasAPI.Controllers
             if (usuario == null) return NotFound();
             _context.Usuarios.Remove(usuario);
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ELIMINAR_USUARIO", $"Usuario #{id} eliminado");
             return NoContent();
         }
 

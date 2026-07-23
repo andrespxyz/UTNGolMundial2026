@@ -17,5 +17,13 @@ namespace PublicFrontend.Controllers
             var partidos = await _estadisticas.GetPartidosAsync();
             return View(partidos);
         }
+
+        public async Task<IActionResult> Detalle(int id)
+        {
+            var partidos = await _estadisticas.GetPartidosAsync();
+            var partido = partidos.FirstOrDefault(p => p.Id == id);
+            if (partido == null) return NotFound();
+            return View(partido);
+        }
     }
 }

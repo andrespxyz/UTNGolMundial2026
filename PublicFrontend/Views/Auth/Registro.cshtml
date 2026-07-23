@@ -1,4 +1,5 @@
-﻿@{
+﻿@model PublicFrontend.Models.ViewModels.RegistroViewModel
+@{
     ViewData["Title"] = "Registro";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -19,15 +20,18 @@
         <form method="post" asp-action="Registro">
             <div class="form-group">
                 <label>Nombre de usuario</label>
-                <input type="text" name="nombreUsuario" class="form-control" placeholder="ej. andres123" required />
+                <input asp-for="NombreUsuario" class="form-control" placeholder="ej. andres123" />
+                <span asp-validation-for="NombreUsuario" style="color:#CC0000; font-size:13px;"></span>
             </div>
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" class="form-control" placeholder="tu@email.com" required />
+                <input asp-for="Email" class="form-control" placeholder="tu@email.com" />
+                <span asp-validation-for="Email" style="color:#CC0000; font-size:13px;"></span>
             </div>
             <div class="form-group">
                 <label>Contraseña</label>
-                <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                <input asp-for="Password" type="password" class="form-control" placeholder="Mínimo 6 caracteres" />
+                <span asp-validation-for="Password" style="color:#CC0000; font-size:13px;"></span>
             </div>
             <button type="submit" class="btn btn-red" style="width:100%; margin-top:8px;">
                 Crear cuenta
@@ -40,3 +44,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

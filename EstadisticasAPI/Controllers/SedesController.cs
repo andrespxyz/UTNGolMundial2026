@@ -1,4 +1,5 @@
 ﻿using EstadisticasAPI.Data;
+using EstadisticasAPI.Helpers;
 using EstadisticasAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,15 +30,23 @@ namespace EstadisticasAPI.Controllers
         {
             _context.Sedes.Add(sede);
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "CREAR_SEDE", $"Sede: {sede.Nombre}");
             return CreatedAtAction(nameof(GetSede), new { id = sede.Id }, sede);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSede(int id, Sede sede)
         {
-            if (id != sede.Id) return BadRequest();
-            _context.Entry(sede).State = EntityState.Modified;
+            var existente = await _context.Sedes.FindAsync(id);
+            if (existente == null) return NotFound();
+
+            existente.Nombre = sede.Nombre;
+            existente.Ciudad = sede.Ciudad;
+            existente.Pais = sede.Pais;
+            existente.Capacidad = sede.Capacidad;
+
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ACTUALIZAR_SEDE", $"Sede #{id} — {existente.Nombre}");
             return NoContent();
         }
 
@@ -48,6 +57,7 @@ namespace EstadisticasAPI.Controllers
             if (sede == null) return NotFound();
             _context.Sedes.Remove(sede);
             await _context.SaveChangesAsync();
+            await AuditoriaHelper.RegistrarAsync(_context, Request, "ELIMINAR_SEDE", $"Sede #{id} — {sede.Nombre}");
             return NoContent();
         }
     }

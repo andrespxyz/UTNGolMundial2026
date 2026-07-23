@@ -22,20 +22,42 @@ namespace PublicFrontend.Services
 
         public async Task<List<Seleccion>> GetSeleccionesAsync()
         {
-            var json = await _http.GetStringAsync($"{BaseUrl}/Selecciones");
-            return JsonSerializer.Deserialize<List<Seleccion>>(json, Opts) ?? new();
+            try
+            {
+                var json = await _http.GetStringAsync($"{BaseUrl}/Selecciones");
+                return JsonSerializer.Deserialize<List<Seleccion>>(json, Opts) ?? new();
+            }
+            catch
+            {
+                // degradación controlada: si EstadisticasAPI no responde, no se rompe la vista
+                return new();
+            }
         }
 
         public async Task<List<Partido>> GetPartidosAsync()
         {
-            var json = await _http.GetStringAsync($"{BaseUrl}/Partidos");
-            return JsonSerializer.Deserialize<List<Partido>>(json, Opts) ?? new();
+            try
+            {
+                var json = await _http.GetStringAsync($"{BaseUrl}/Partidos");
+                return JsonSerializer.Deserialize<List<Partido>>(json, Opts) ?? new();
+            }
+            catch
+            {
+                return new();
+            }
         }
 
         public async Task<List<Sede>> GetSedesAsync()
         {
-            var json = await _http.GetStringAsync($"{BaseUrl}/Sedes");
-            return JsonSerializer.Deserialize<List<Sede>>(json, Opts) ?? new();
+            try
+            {
+                var json = await _http.GetStringAsync($"{BaseUrl}/Sedes");
+                return JsonSerializer.Deserialize<List<Sede>>(json, Opts) ?? new();
+            }
+            catch
+            {
+                return new();
+            }
         }
 
         public async Task<(bool exito, object? datos, string mensaje)> LoginAsync(string email, string password)

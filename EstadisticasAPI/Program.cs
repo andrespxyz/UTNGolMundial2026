@@ -1,10 +1,13 @@
 using EstadisticasAPI.Data;
+using EstadisticasAPI.Services;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<PartidoResultadoService>();
+builder.Services.AddSingleton<JwtService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

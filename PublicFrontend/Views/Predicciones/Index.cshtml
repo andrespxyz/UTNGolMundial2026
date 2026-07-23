@@ -64,7 +64,7 @@
                     </div>
                     <div class="form-group" style="margin:0">
                         <label>Monto (UTNGolCoin)</label>
-                        <input type="number" name="monto" min="1" max="@billetera.Saldo"
+                        <input type="number" name="monto" min="0.01" max="@billetera.Saldo" step="0.01"
                                value="1" class="form-control" style="width:120px" />
                     </div>
                     <button type="submit" class="btn btn-red">🎯 Predecir</button>
@@ -101,7 +101,7 @@
                         <td>Partido #@pred.PartidoId</td>
                         <td>@pred.Pronostico</td>
                         <td>@pred.Monto UTNGolCoin</td>
-                        <td>x@pred.Cuota</td>
+                        <td>x@(pred.Cuota.ToString("0.0"))</td>
                         <td>
                             <span class="badge @(pred.Estado == "GANADA" ? "badge-green" : pred.Estado == "PERDIDA" ? "badge-red" : "badge-gray")">
                                 @pred.Estado

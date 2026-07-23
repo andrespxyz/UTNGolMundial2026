@@ -19,12 +19,9 @@ namespace EstadisticasAPI.Controllers
                 .OrderByDescending(a => a.Fecha)
                 .ToListAsync();
 
-        [HttpPost]
-        public async Task<ActionResult<Auditoria>> PostAuditoria(Auditoria auditoria)
-        {
-            _context.Auditorias.Add(auditoria);
-            await _context.SaveChangesAsync();
-            return Ok(auditoria);
-        }
+        // Deliberadamente sin POST: la auditoría solo se registra de forma
+        // automática vía AuditoriaHelper (header X-Usuario-Id) desde los
+        // propios controllers de negocio. Un POST público permitiría a
+        // cualquiera insertar registros de auditoría falsos (RF24).
     }
 }

@@ -12,6 +12,7 @@
         <div class="navbar-nav">
             <a class="nav-link" asp-controller="Home" asp-action="Index"> Inicio</a>
             <a class="nav-link" asp-controller="Calendario" asp-action="Index"> Calendario</a>
+            <a class="nav-link" asp-controller="Eliminatorias" asp-action="Index"> Eliminatorias</a>
             <a class="nav-link" asp-controller="Posiciones" asp-action="Index"> Posiciones</a>
             <a class="nav-link" asp-controller="Estadisticas" asp-action="Index"> Estadísticas</a>
             <a class="nav-link" asp-controller="Predicciones" asp-action="Index"> Predicciones</a>
@@ -44,6 +45,7 @@
         <p style="margin-top:8px">UTNGolCoin es una moneda académica ficticia sin valor monetario real.</p>
     </footer>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

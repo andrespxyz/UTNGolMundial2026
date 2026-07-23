@@ -1,4 +1,5 @@
-﻿using PublicFrontend.Models;
+using Microsoft.AspNetCore.Http;
+using PublicFrontend.Models;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -8,20 +9,37 @@ namespace PublicFrontend.Services
     public class UTNGolCoinClientService
     {
         private readonly HttpClient _http;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private const string BaseUrl = "http://localhost:8080/UTNGolCoinAPI/api";
 
-        public UTNGolCoinClientService()
+        public UTNGolCoinClientService(IHttpContextAccessor httpContextAccessor)
         {
             _http = new HttpClient();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private JsonSerializerOptions Opts => new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // RF25 — adjunta el JWT emitido por EstadisticasAPI en el login/registro,
+        // guardado en sesión, para las rutas de UTNGolCoinAPI que ahora exigen
+        // autenticación (todas salvo el ranking público).
+        private HttpRequestMessage ConToken(HttpMethod metodo, string url)
+        {
+            var request = new HttpRequestMessage(metodo, url);
+            var token = _httpContextAccessor.HttpContext?.Session.GetString("Token");
+            if (!string.IsNullOrEmpty(token))
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            return request;
+        }
 
         public async Task<Billetera?> GetBilleteraAsync(int usuarioId)
         {
             try
             {
-                var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/usuario/{usuarioId}");
+                var request = ConToken(HttpMethod.Get, $"{BaseUrl}/billeteras/usuario/{usuarioId}");
+                var response = await _http.SendAsync(request);
+                if (!response.IsSuccessStatusCode) return null;
+                var json = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<Billetera>(json, Opts);
             }
             catch (Exception ex)
@@ -31,12 +49,13 @@ namespace PublicFrontend.Services
             }
         }
 
-        public async Task<List<Billetera>> GetRankingAsync()
+        public async Task<List<RankingEntry>> GetRankingAsync()
         {
             try
             {
+                // Ranking público (RF21) — no requiere token.
                 var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/ranking");
-                return JsonSerializer.Deserialize<List<Billetera>>(json, Opts) ?? new();
+                return JsonSerializer.Deserialize<List<RankingEntry>>(json, Opts) ?? new();
             }
             catch (Exception ex)
             {
@@ -57,8 +76,9 @@ namespace PublicFrontend.Services
                     monto = monto.ToString(),
                     fechaHoraPartido
                 });
-                var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var response = await _http.PostAsync($"{BaseUrl}/predicciones", content);
+                var request = ConToken(HttpMethod.Post, $"{BaseUrl}/predicciones");
+                request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+                var response = await _http.SendAsync(request);
                 var responseBody = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -77,7 +97,10 @@ namespace PublicFrontend.Services
         {
             try
             {
-                var json = await _http.GetStringAsync($"{BaseUrl}/predicciones/billetera/{billeteraId}");
+                var request = ConToken(HttpMethod.Get, $"{BaseUrl}/predicciones/billetera/{billeteraId}");
+                var response = await _http.SendAsync(request);
+                if (!response.IsSuccessStatusCode) return new();
+                var json = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<List<Prediccion>>(json, Opts) ?? new();
             }
             catch (Exception ex)
@@ -92,8 +115,9 @@ namespace PublicFrontend.Services
             try
             {
                 var body = JsonSerializer.Serialize(new { usuarioId, nombreUsuario });
-                var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var response = await _http.PostAsync($"{BaseUrl}/billeteras", content);
+                var request = ConToken(HttpMethod.Post, $"{BaseUrl}/billeteras");
+                request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+                var response = await _http.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -116,7 +140,8 @@ namespace PublicFrontend.Services
         {
             try
             {
-                var response = await _http.PostAsync($"{BaseUrl}/billeteras/{billeteraId}/bono-diario", null);
+                var request = ConToken(HttpMethod.Post, $"{BaseUrl}/billeteras/{billeteraId}/bono-diario");
+                var response = await _http.SendAsync(request);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
@@ -130,7 +155,10 @@ namespace PublicFrontend.Services
         {
             try
             {
-                var json = await _http.GetStringAsync($"{BaseUrl}/billeteras/{billeteraId}/transacciones");
+                var request = ConToken(HttpMethod.Get, $"{BaseUrl}/billeteras/{billeteraId}/transacciones");
+                var response = await _http.SendAsync(request);
+                if (!response.IsSuccessStatusCode) return new();
+                var json = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<List<Transaccion>>(json, Opts) ?? new();
             }
             catch (Exception ex)

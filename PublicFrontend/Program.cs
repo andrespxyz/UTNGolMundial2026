@@ -3,6 +3,7 @@ using PublicFrontend.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<EstadisticasClientService>();
 builder.Services.AddSingleton<UTNGolCoinClientService>();
 builder.Services.AddSession(options =>
